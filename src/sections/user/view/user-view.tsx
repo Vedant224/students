@@ -1,5 +1,5 @@
 import { useState, useEffect , useCallback } from 'react';
-import {  doc, addDoc, getDocs, updateDoc, deleteDoc , collection} from 'firebase/firestore';
+import {  doc, addDoc, getDocs, updateDoc, deleteDoc , collection, getDoc, query, where} from 'firebase/firestore';
 
 import { db } from 'src/firebase'; // Adjust the import path to your firebase.ts file
 
@@ -128,25 +128,82 @@ export function UserView() {
       }
       handleCloseModal();
     } catch (error) {
-      console.error('Error adding/updating document: ', error);
+      // console.error('Error adding/updating document: ', error);
     }
   };
 
-  const handleEdit = (student: UserProps) => {
-    setFormData(student);
-    setEditStudentId(student.id);
-    setOpenModal(true);
-  };
-
-  const handleDelete = async (id: string) => {
+  const handleEdit = async (name: string) => {
     try {
-      await deleteDoc(doc(db, 'students', id));
-      // Refresh the student list
-      await fetchStudents();
+      // console.log('Attempting to edit student with name:', name);
+  
+      // Query Firestore to find the student by name
+      const querySnapshot = await getDocs(
+        query(collection(db, 'students'), where('name', '==', name))
+      );
+  
+      if (!querySnapshot.empty) {
+        // Get the student data from the query result
+        const studentDoc = querySnapshot.docs[0];
+        const studentData = studentDoc.data();
+  
+        // Set form data for editing
+        setFormData({
+          id: studentDoc.id,
+          name: studentData.name,  // Ensure all fields are set
+          class: studentData.class,
+          section: studentData.section,
+          rollno: studentData.rollno,
+          subject: studentData.subject,
+          dob: studentData.dob,
+          email: studentData.email,
+          gender: studentData.gender,
+          parentName: studentData.parentName,
+          phone: studentData.phone,
+          address: studentData.address,
+          // Add any other fields here that are part of UserProps
+        });
+        setEditStudentId(studentDoc.id);
+        setOpenModal(true);
+        // console.log('Student data set for editing.');
+      } else {
+        // console.log('No student found with the name:', name);
+      }
+    } catch (error) {
+      console.error('Error editing student: ', error);
+    }
+  };
+  
+  
+
+  const handleDelete = async (name: string) => {
+    try {
+      // console.log('Attempting to delete student with name:', name);
+  
+      // Query Firestore to find the student by name
+      const querySnapshot = await getDocs(
+        query(collection(db, 'students'), where('name', '==', name))
+      );
+  
+      if (!querySnapshot.empty) {
+        // Get the document ID of the first matching student
+        const studentDoc = querySnapshot.docs[0];
+        const studentId = studentDoc.id;
+  
+        // Delete the student document by ID
+        await deleteDoc(doc(db, 'students', studentId));
+        // console.log('Student document deleted successfully.');
+  
+        // Re-fetch the students list after deletion
+        fetchStudents();
+      } else {
+        // console.log('No student found with the name:', name);
+      }
     } catch (error) {
       console.error('Error deleting document: ', error);
     }
   };
+  
+  
 
   if (loading) {
     return (
@@ -210,8 +267,8 @@ export function UserView() {
                     <UserTableRow
                       key={row.id}
                       row={row}
-                      onEdit={() => handleEdit(row)}
-                      onDelete={() => handleDelete(row.id)}
+                      onEdit={() => handleEdit(row.name)}
+                      onDelete={() => handleDelete(row.name)}
                     />
                   ))}
 
