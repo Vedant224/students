@@ -29,8 +29,8 @@ export function SignInView(): JSX.Element {
 
   // Use a single state object for form-related state
   const [formState, setFormState] = useState<FormState>({
-    email: '',
-    password: '',
+    email: 'admin@123.com',
+    password: 'admin@123',
     showPassword: false,
     loading: false,
     error: '',
@@ -127,6 +127,20 @@ export function SignInView(): JSX.Element {
     <>
       <Box gap={1.5} display="flex" flexDirection="column" alignItems="center" sx={{ mb: 5 }}>
         <Typography variant="h5">Sign in</Typography>
+        <Typography
+          variant="body2"
+          sx={{
+            color: 'red',
+            border: '1px solid red',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            boxShadow: 'inset 0px 0px 5px rgba(255, 0, 0, 0.1), 0px 0px 5px rgba(255, 0, 0, 0.1)',
+            textAlign: 'center',
+            backgroundColor: 'rgba(255, 0, 0, 0.02)', 
+          }}
+  >
+    Only the admin can sign in using <strong>admin@123.com</strong>
+  </Typography>
       </Box>
 
       {renderForm}
