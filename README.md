@@ -22,8 +22,8 @@ Follow these steps to set up the project on your local machine:
 
 ```bash
 # Clone the repository
-git clone https://github.com/Vedant224/student-dashboard-management.git
-cd student-dashboard-management
+git clone https://github.com/Vedant224/students.git
+cd students
 
 # Install dependencies
 npm install
